@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>    
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CoreCompat.Selenium.WebDriver" Version="3.4.0-je-beta007" />
+    <PackageReference Include="CoreCompat.WebDriver.Support" Version="3.4.0-je-beta007" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
+    <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="2.30.0.1" />
+    <PackageReference Include="Selenium.WebDriver.GeckoDriver" Version="0.17.0" />
+    <PackageReference Include="Selenium.WebDriver.IEDriver" Version="3.4.0" />
+    <PackageReference Include="Selenium.WebDriver.MicrosoftWebDriver" Version="10.0.15063" />
+    <PackageReference Include="xunit" Version="2.2.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
+  </ItemGroup>
+</Project>
