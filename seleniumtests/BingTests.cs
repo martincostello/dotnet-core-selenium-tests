@@ -4,7 +4,7 @@ using Xunit;
 
 namespace seleniumtests
 {
-    public static class GoogleTests
+    public static class BingTests
     {
         [Theory]
         [InlineData("Chrome")]
