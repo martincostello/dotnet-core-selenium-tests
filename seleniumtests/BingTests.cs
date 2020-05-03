@@ -19,7 +19,9 @@ namespace seleniumtests
         public static void Search_For_DotNet_Core(string browserName)
         {
             // Arrange
-            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), $"{browserName} is only supported on Windows.");
+            Skip.If(
+                !RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && (browserName == "Edge" || browserName == "InternetExplorer"),
+                $"{browserName} is only supported on Windows.");
 
             // Act
             using var driver = CreateWebDriver(browserName);
