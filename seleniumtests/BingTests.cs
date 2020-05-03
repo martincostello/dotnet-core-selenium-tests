@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
@@ -10,18 +11,21 @@ namespace seleniumtests
 {
     public static class BingTests
     {
-        [Theory]
+        [SkippableTheory]
         [InlineData("Chrome")]
         [InlineData("Edge")]
         [InlineData("Firefox")]
         [InlineData("InternetExplorer")] // Follow https://stackoverflow.com/a/36836137/1064169 for one-time setup
         public static void Search_For_DotNet_Core(string browserName)
         {
-            string url = "https://bing.com"; // Google doesn't seem to work properly in IE at the moment...
+            // Arrange
+            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), $"{browserName} is only supported on Windows.");
 
+            // Act
             using var driver = CreateWebDriver(browserName);
+            driver.Navigate().GoToUrl("https://bing.com");
 
-            driver.Navigate().GoToUrl(url);
+            // Assert
             driver.FindElement(By.Name("q")).SendKeys("dotnet core" + Keys.Enter);
         }
 
