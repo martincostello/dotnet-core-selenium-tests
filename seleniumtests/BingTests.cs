@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Security.Principal;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
@@ -22,6 +23,10 @@ namespace seleniumtests
             Skip.If(
                 !RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && (browserName == "Edge" || browserName == "InternetExplorer"),
                 $"{browserName} is only supported on Windows.");
+
+            Skip.If(
+                RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && browserName == "Edge" && WindowsIdentity.GetCurrent().User.IsWellKnown(WellKnownSidType.BuiltinAdministratorsSid),
+                $"Edge cannot used with the Built-In Administrator account or while User Account Control is turned off.");
 
             // Act
             using var driver = CreateWebDriver(browserName);
