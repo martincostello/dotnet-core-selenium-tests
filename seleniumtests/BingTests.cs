@@ -25,8 +25,8 @@ namespace seleniumtests
                 $"{browserName} is only supported on Windows.");
 
             Skip.If(
-                RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && browserName == "Edge" && WindowsIdentity.GetCurrent().User.IsWellKnown(WellKnownSidType.BuiltinAdministratorsSid),
-                $"Edge cannot used with the Built-In Administrator account or while User Account Control is turned off.");
+                RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && browserName == "Edge" && Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != null,
+                "Edge cannot used in GitHub Actions");
 
             // Act
             using var driver = CreateWebDriver(browserName);
