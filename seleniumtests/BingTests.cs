@@ -42,12 +42,25 @@ namespace seleniumtests
 
             return browserName.ToLowerInvariant() switch
             {
-                "chrome" => new ChromeDriver(driverDirectory),
+                "chrome" => CreateChromeDriver(driverDirectory),
                 "edge" => new EdgeDriver(driverDirectory),
                 "firefox" => new FirefoxDriver(driverDirectory),
                 "internetexplorer" => new InternetExplorerDriver(driverDirectory, new InternetExplorerOptions() { IgnoreZoomLevel = true }),
                 _ => throw new NotSupportedException($"The browser '{browserName}' is not supported."),
             };
+        }
+
+        private static IWebDriver CreateChromeDriver(string driverDirectory)
+        {
+            var options = new ChromeOptions();
+
+            // HACK Workaround for "(unknown error: DevToolsActivePort file doesn't exist)"
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                options.AddArgument("--no-sandbox");
+            }
+
+            return new ChromeDriver(driverDirectory, options);
         }
     }
 }
