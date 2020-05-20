@@ -39,22 +39,25 @@ namespace seleniumtests
         private static IWebDriver CreateWebDriver(string browserName)
         {
             string driverDirectory = System.IO.Path.GetDirectoryName(typeof(BingTests).Assembly.Location) ?? ".";
+            bool isDebuggerAttached = System.Diagnostics.Debugger.IsAttached;
 
             return browserName.ToLowerInvariant() switch
             {
-                "chrome" => CreateChromeDriver(driverDirectory),
+                "chrome" => CreateChromeDriver(driverDirectory, isDebuggerAttached),
                 "edge" => new EdgeDriver(driverDirectory),
-                "firefox" => new FirefoxDriver(driverDirectory),
+                "firefox" => CreateFirefoxDriver(driverDirectory, isDebuggerAttached),
                 "internetexplorer" => new InternetExplorerDriver(driverDirectory, new InternetExplorerOptions() { IgnoreZoomLevel = true }),
                 _ => throw new NotSupportedException($"The browser '{browserName}' is not supported."),
             };
         }
 
-        private static IWebDriver CreateChromeDriver(string driverDirectory)
+        private static IWebDriver CreateChromeDriver(
+            string driverDirectory,
+            bool isDebuggerAttached)
         {
             var options = new ChromeOptions();
 
-            if (!System.Diagnostics.Debugger.IsAttached)
+            if (!isDebuggerAttached)
             {
                 options.AddArgument("--headless");
             }
@@ -66,6 +69,20 @@ namespace seleniumtests
             }
 
             return new ChromeDriver(driverDirectory, options);
+        }
+
+        private static IWebDriver CreateFirefoxDriver(
+            string driverDirectory,
+            bool isDebuggerAttached)
+        {
+            var options = new FirefoxOptions();
+
+            if (!isDebuggerAttached)
+            {
+                options.AddArgument("--headless");
+            }
+
+            return new FirefoxDriver(driverDirectory, options);
         }
     }
 }
