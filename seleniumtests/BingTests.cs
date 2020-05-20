@@ -38,12 +38,14 @@ namespace seleniumtests
 
         private static IWebDriver CreateWebDriver(string browserName)
         {
+            string driverDirectory = System.IO.Path.GetDirectoryName(typeof(BingTests).Assembly.Location) ?? ".";
+
             return browserName.ToLowerInvariant() switch
             {
-                "chrome" => new ChromeDriver(),
-                "edge" => new EdgeDriver(),
-                "firefox" => new FirefoxDriver(),
-                "internetexplorer" => new InternetExplorerDriver(new InternetExplorerOptions() { IgnoreZoomLevel = true }),
+                "chrome" => new ChromeDriver(driverDirectory),
+                "edge" => new EdgeDriver(driverDirectory),
+                "firefox" => new FirefoxDriver(driverDirectory),
+                "internetexplorer" => new InternetExplorerDriver(driverDirectory, new InternetExplorerOptions() { IgnoreZoomLevel = true }),
                 _ => throw new NotSupportedException($"The browser '{browserName}' is not supported."),
             };
         }
