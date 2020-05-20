@@ -54,6 +54,11 @@ namespace seleniumtests
         {
             var options = new ChromeOptions();
 
+            if (!System.Diagnostics.Debugger.IsAttached)
+            {
+                options.AddArgument("--headless");
+            }
+
             // HACK Workaround for "(unknown error: DevToolsActivePort file doesn't exist)"
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
