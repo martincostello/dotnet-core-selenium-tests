@@ -95,26 +95,37 @@
   -->
   <Target Name="DownloadWebDriverForChromiumEdge"
           BeforeTargets="CollectPackageReferences"
-          Condition="@(PackageReference->AnyHaveMetadataValue(`Identity`, `Selenium.WebDriver.MicrosoftWebDriver`)) and $([MSBuild]::IsOsPlatform(`Windows`))">
+          Condition="@(PackageReference->AnyHaveMetadataValue(`Identity`, `Selenium.WebDriver.MicrosoftWebDriver`)) and ($([MSBuild]::IsOsPlatform(`Windows`)) or $([MSBuild]::IsOsPlatform(`OSX`)))">
     <Message Text="Downloading driver for Chromium-based Microsoft Edge..." Importance="normal" />
     <!--
       Search for Microsoft Edge in the well-known installation locations.
     -->
     <Message Text="Searching for an installation of Microsoft Edge..." Importance="normal" />
-    <ItemGroup>
+    <ItemGroup Condition="$([MSBuild]::IsOsPlatform(`Windows`))">
       <_EdgeVersions Include="$(ProgramFiles)\Microsoft\Edge\Application\**\*.manifest"/>
       <_EdgeVersions Include="$(MSBuildProgramFiles32)\Microsoft\Edge\Application\**\*.manifest"/>
     </ItemGroup>
     <PropertyGroup Condition="@(_EdgeVersions->Count()) > 0">
       <_EdgeVersion Condition=" $([System.Char]::IsDigit(`%(_EdgeVersions.Filename)`, 0)) ">%(_EdgeVersions.Filename)</_EdgeVersion>
     </PropertyGroup>
+    <!-- On macOS query the well-known binary for the version -->
+    <Exec Condition="$([MSBuild]::IsOsPlatform(`OSX`))"
+          ConsoleToMSBuild="true"
+          Command="'/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge' --version"
+          IgnoreExitCode="true"
+          StandardOutputImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="_EdgeVersion" />
+    </Exec>
     <!--
       Validate that the installed version of Microsoft Edge was found.
     -->
     <Message Condition=" '$(_EdgeVersion)' == '' " Text="Chromium-based Microsoft Edge is not installed." Importance="normal" />
     <Message Condition=" '$(_EdgeVersion)' != '' " Text="Chromium-based Microsoft Edge version $(_EdgeVersion) is installed." Importance="normal" />
     <PropertyGroup Condition=" '$(_EdgeVersion)' != '' ">
-      <_EdgeDriverLatestVersionUri>https://msedgedriver.azureedge.net/$(_EdgeVersion)/edgedriver_win64.zip</_EdgeDriverLatestVersionUri>
+      <_EdgeDriverZipName Condition="$([MSBuild]::IsOsPlatform(`OSX`))">edgedriver_mac64.zip</_EdgeDriverZipName>
+      <_EdgeDriverZipName Condition="$([MSBuild]::IsOsPlatform(`Windows`)) and '$(MSBuildProgramFiles32)' == ''">edgedriver_win32.zip</_EdgeDriverZipName>
+      <_EdgeDriverZipName Condition="$([MSBuild]::IsOsPlatform(`Windows`)) and '$(MSBuildProgramFiles32)' != ''">edgedriver_win64.zip</_EdgeDriverZipName>
+      <_EdgeDriverLatestVersionUri>https://msedgedriver.azureedge.net/$(_EdgeVersion)/$(_EdgeDriverZipName)</_EdgeDriverLatestVersionUri>
     </PropertyGroup>
     <!--
       Download the ZIP file containing the latest version of the driver for this version of Edge.
