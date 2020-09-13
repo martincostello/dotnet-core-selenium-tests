@@ -1,9 +1,8 @@
 using System;
 using System.Runtime.InteropServices;
-using System.Security.Principal;
+using Microsoft.Edge.SeleniumTools;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.IE;
 using Xunit;
@@ -44,7 +43,7 @@ namespace seleniumtests
             return browserName.ToLowerInvariant() switch
             {
                 "chrome" => CreateChromeDriver(driverDirectory, isDebuggerAttached),
-                "edge" => new EdgeDriver(driverDirectory),
+                "edge" => CreateEdgeDriver(driverDirectory, isDebuggerAttached),
                 "firefox" => CreateFirefoxDriver(driverDirectory, isDebuggerAttached),
                 "internetexplorer" => new InternetExplorerDriver(driverDirectory, new InternetExplorerOptions() { IgnoreZoomLevel = true }),
                 _ => throw new NotSupportedException($"The browser '{browserName}' is not supported."),
@@ -69,6 +68,23 @@ namespace seleniumtests
             }
 
             return new ChromeDriver(driverDirectory, options);
+        }
+
+        private static IWebDriver CreateEdgeDriver(
+            string driverDirectory,
+            bool isDebuggerAttached)
+        {
+            var options = new EdgeOptions()
+            {
+                UseChromium = true,
+            };
+
+            if (!isDebuggerAttached)
+            {
+                options.AddArgument("--headless");
+            }
+
+            return new EdgeDriver(driverDirectory, options);
         }
 
         private static IWebDriver CreateFirefoxDriver(

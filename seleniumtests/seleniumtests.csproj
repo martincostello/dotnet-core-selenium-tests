@@ -6,12 +6,12 @@
     <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Edge.SeleniumTools" Version="3.141.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
     <PackageReference Include="Selenium.Support" Version="3.141.0" />
     <PackageReference Include="Selenium.WebDriver" Version="3.141.0" />
     <PackageReference Include="Selenium.WebDriver.GeckoDriver" Version="0.27.0" />
     <PackageReference Include="Selenium.WebDriver.IEDriver" Version="3.150.1.2" />
-    <PackageReference Include="Selenium.WebDriver.MicrosoftWebDriver" Version="10.0.17134" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3" />
     <PackageReference Include="Xunit.SkippableFact" Version="1.4.13" />
@@ -89,5 +89,54 @@
       <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="$(ChromeDriverVersion)" />
     </ItemGroup>
     <Message Text="Added package reference to Selenium.WebDriver.ChromeDriver version '$(ChromeDriverVersion)'." Importance="normal" />
+  </Target>
+  <!--
+    Automatically downloads the correct web driver for Chromium-based Microsoft Edge.
+  -->
+  <Target Name="DownloadWebDriverForChromiumEdge"
+          BeforeTargets="CollectPackageReferences"
+          Condition="@(PackageReference->AnyHaveMetadataValue(`Identity`, `Selenium.WebDriver.MicrosoftWebDriver`)) and $([MSBuild]::IsOsPlatform(`Windows`))">
+    <Message Text="Downloading driver for Chromium-based Microsoft Edge..." Importance="normal" />
+    <!--
+      Search for Microsoft Edge in the well-known installation locations.
+    -->
+    <Message Text="Searching for an installation of Microsoft Edge..." Importance="normal" />
+    <ItemGroup>
+      <_EdgeVersions Include="$(ProgramFiles)\Microsoft\Edge\Application\**\*.manifest"/>
+      <_EdgeVersions Include="$(MSBuildProgramFiles32)\Microsoft\Edge\Application\**\*.manifest"/>
+    </ItemGroup>
+    <PropertyGroup Condition="@(_EdgeVersions->Count()) > 0">
+      <_EdgeVersion Condition=" $([System.Char]::IsDigit(`%(_EdgeVersions.Filename)`, 0)) ">%(_EdgeVersions.Filename)</_EdgeVersion>
+    </PropertyGroup>
+    <!--
+      Validate that the installed version of Microsoft Edge was found.
+    -->
+    <Message Condition=" '$(_EdgeVersion)' == '' " Text="Chromium-based Microsoft Edge is not installed." Importance="normal" />
+    <Message Condition=" '$(_EdgeVersion)' != '' " Text="Chromium-based Microsoft Edge version $(_EdgeVersion) is installed." Importance="normal" />
+    <PropertyGroup Condition=" '$(_EdgeVersion)' != '' ">
+      <_EdgeDriverLatestVersionUri>https://msedgedriver.azureedge.net/$(_EdgeVersion)/edgedriver_win64.zip</_EdgeDriverLatestVersionUri>
+    </PropertyGroup>
+    <!--
+      Download the ZIP file containing the latest version of the driver for this version of Edge.
+      See https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/.
+    -->
+    <Message Condition=" '$(_EdgeDriverLatestVersionUri)' != '' " Text="Downloading latest Microsoft Edge driver version from '$(_EdgeDriverLatestVersionUri)'..." Importance="normal" />
+    <DownloadFile Condition=" '$(_EdgeDriverLatestVersionUri)' != '' "
+                  SourceUrl="$(_EdgeDriverLatestVersionUri)"
+                  DestinationFolder="$(BaseIntermediateOutputPath)"
+                  Retries="1">
+      <Output TaskParameter="DownloadedFile" PropertyName="_EdgeDriverLatestVersionZipFile" />
+    </DownloadFile>
+    <ItemGroup Condition=" '$(_EdgeDriverLatestVersionZipFile)' != '' ">
+      <FileWrites Include="$(_EdgeDriverLatestVersionZipFile)" />
+    </ItemGroup>
+    <!--
+      Unzip the driver to the output directory.
+    -->
+    <Unzip Condition=" '$(_EdgeDriverLatestVersionZipFile)' != '' "
+           SourceFiles="$(_EdgeDriverLatestVersionZipFile)"
+           DestinationFolder="$(OutputPath)"
+           OverwriteReadOnlyFiles="true"
+           SkipUnchangedFiles="true" />
   </Target>
 </Project>
