@@ -27,6 +27,10 @@ namespace seleniumtests
                 RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && browserName == "Edge",
                 $"{browserName} is not supported on Linux.");
 
+            Skip.If(
+                RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && browserName == "Edge" && Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != null,
+                $"{browserName} is not supported on macOS in GitHub Actions.");
+
             // Act
             using var driver = CreateWebDriver(browserName);
             driver.Navigate().GoToUrl("https://bing.com");
