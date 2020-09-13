@@ -125,6 +125,7 @@
       <_EdgeDriverZipName Condition="$([MSBuild]::IsOsPlatform(`OSX`))">edgedriver_mac64.zip</_EdgeDriverZipName>
       <_EdgeDriverZipName Condition="$([MSBuild]::IsOsPlatform(`Windows`)) and '$(MSBuildProgramFiles32)' == ''">edgedriver_win32.zip</_EdgeDriverZipName>
       <_EdgeDriverZipName Condition="$([MSBuild]::IsOsPlatform(`Windows`)) and '$(MSBuildProgramFiles32)' != ''">edgedriver_win64.zip</_EdgeDriverZipName>
+      <_EdgeVersion>$(_EdgeVersion.Replace(`Microsoft Edge `, ``))</_EdgeVersion>
       <_EdgeDriverLatestVersionUri>https://msedgedriver.azureedge.net/$(_EdgeVersion)/$(_EdgeDriverZipName)</_EdgeDriverLatestVersionUri>
     </PropertyGroup>
     <!--
