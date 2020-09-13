@@ -20,12 +20,12 @@ namespace seleniumtests
         {
             // Arrange
             Skip.If(
-                !RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && (browserName == "Edge" || browserName == "InternetExplorer"),
+                !RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && browserName == "InternetExplorer",
                 $"{browserName} is only supported on Windows.");
 
             Skip.If(
-                RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && browserName == "Edge" && Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != null,
-                "Edge cannot used in GitHub Actions");
+                RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && browserName == "Edge",
+                $"{browserName} is not supported on Linux.");
 
             // Act
             using var driver = CreateWebDriver(browserName);
