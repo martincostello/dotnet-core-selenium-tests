@@ -95,7 +95,7 @@
   -->
   <Target Name="DownloadWebDriverForChromiumEdge"
           BeforeTargets="CollectPackageReferences"
-          Condition="@(PackageReference->AnyHaveMetadataValue(`Identity`, `Selenium.WebDriver.MicrosoftWebDriver`)) and ($([MSBuild]::IsOsPlatform(`Windows`)) or $([MSBuild]::IsOsPlatform(`OSX`)))">
+          Condition="@(PackageReference->AnyHaveMetadataValue(`Identity`, `Microsoft.Edge.SeleniumTools`)) and ($([MSBuild]::IsOsPlatform(`Windows`)) or $([MSBuild]::IsOsPlatform(`OSX`)))">
     <Message Text="Downloading driver for Chromium-based Microsoft Edge..." Importance="normal" />
     <!--
       Search for Microsoft Edge in the well-known installation locations.
