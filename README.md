@@ -1,6 +1,6 @@
-# .NET Core Selenium Tests
+# .NET Selenium Tests
 
-A simple test implemented in .NET Core 3.1 that uses Selenium WebDriver with multiple browsers.
+A simple test implemented in .NET 6 that uses Selenium WebDriver with multiple browsers.
 
 ```cmd
 git clone https://github.com/martincostello/dotnet-core-selenium-tests.git
