@@ -4,7 +4,6 @@ using Microsoft.Edge.SeleniumTools;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
-using OpenQA.Selenium.IE;
 using Xunit;
 
 namespace seleniumtests
@@ -15,14 +14,9 @@ namespace seleniumtests
         [InlineData("Chrome")]
         [InlineData("Edge")]
         [InlineData("Firefox")]
-        [InlineData("InternetExplorer")] // Follow https://stackoverflow.com/a/36836137/1064169 for one-time setup
         public static void Search_For_DotNet_Core(string browserName)
         {
             // Arrange
-            Skip.If(
-                !RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && browserName == "InternetExplorer",
-                $"{browserName} is only supported on Windows.");
-
             Skip.If(
                 RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && browserName == "Edge",
                 $"{browserName} is not supported on Linux.");
@@ -49,7 +43,6 @@ namespace seleniumtests
                 "chrome" => CreateChromeDriver(driverDirectory, isDebuggerAttached),
                 "edge" => CreateEdgeDriver(driverDirectory, isDebuggerAttached),
                 "firefox" => CreateFirefoxDriver(driverDirectory, isDebuggerAttached),
-                "internetexplorer" => new InternetExplorerDriver(driverDirectory, new InternetExplorerOptions() { IgnoreZoomLevel = true }),
                 _ => throw new NotSupportedException($"The browser '{browserName}' is not supported."),
             };
         }
