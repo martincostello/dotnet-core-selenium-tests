@@ -7,7 +7,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Edge.SeleniumTools" Version="3.141.3" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
     <PackageReference Include="Selenium.Support" Version="3.141.0" />
     <PackageReference Include="Selenium.WebDriver" Version="3.141.0" />
     <PackageReference Include="Selenium.WebDriver.GeckoDriver" Version="0.32.0" />
@@ -18,35 +18,25 @@
     <!--
     Automatically adds a package reference for Selenium.WebDriver.ChromeDriver.
   -->
-  <Target Name="AddReferenceToSeleniumWebDriverChromeDriver"
-          BeforeTargets="CollectPackageReferences"
-          Condition="@(PackageReference->AnyHaveMetadataValue(`Identity`, `Selenium.WebDriver`))">
+  <Target Name="AddReferenceToSeleniumWebDriverChromeDriver" BeforeTargets="CollectPackageReferences" Condition="@(PackageReference-&gt;AnyHaveMetadataValue(`Identity`, `Selenium.WebDriver`))">
     <Message Text="Adding package reference for Selenium.WebDriver.ChromeDriver..." Importance="normal" />
     <!--
       Search for Google Chrome in the well-known installation locations on Windows.
     -->
     <Message Text="Searching for an installation of Google Chrome..." Importance="normal" />
     <ItemGroup Condition="$([MSBuild]::IsOsPlatform(`Windows`))">
-      <_ChromeVersions Include="$(ProgramFiles)\Google\Chrome\Application\**\*.manifest"/>
-      <_ChromeVersions Include="$(MSBuildProgramFiles32)\Google\Chrome\Application\**\*.manifest"/>
+      <_ChromeVersions Include="$(ProgramFiles)\Google\Chrome\Application\**\*.manifest" />
+      <_ChromeVersions Include="$(MSBuildProgramFiles32)\Google\Chrome\Application\**\*.manifest" />
     </ItemGroup>
     <PropertyGroup Condition="$([MSBuild]::IsOsPlatform(`Windows`))">
       <_ChromeVersion>%(_ChromeVersions.Filename)</_ChromeVersion>
     </PropertyGroup>
     <!-- On Linux query the well-known binary for the version -->
-    <Exec Condition="$([MSBuild]::IsOsPlatform(`Linux`))"
-          ConsoleToMSBuild="true"
-          Command="google-chrome --product-version"
-          IgnoreExitCode="true"
-          StandardOutputImportance="low">
+    <Exec Condition="$([MSBuild]::IsOsPlatform(`Linux`))" ConsoleToMSBuild="true" Command="google-chrome --product-version" IgnoreExitCode="true" StandardOutputImportance="low">
       <Output TaskParameter="ConsoleOutput" PropertyName="_ChromeVersion" />
     </Exec>
     <!-- On macOS query the well-known binary for the version -->
-    <Exec Condition="$([MSBuild]::IsOsPlatform(`OSX`))"
-          ConsoleToMSBuild="true"
-          Command="'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --version"
-          IgnoreExitCode="true"
-          StandardOutputImportance="low">
+    <Exec Condition="$([MSBuild]::IsOsPlatform(`OSX`))" ConsoleToMSBuild="true" Command="'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --version" IgnoreExitCode="true" StandardOutputImportance="low">
       <Output TaskParameter="ConsoleOutput" PropertyName="_ChromeVersion" />
     </Exec>
     <!--
@@ -63,9 +53,7 @@
       See https://chromedriver.chromium.org/downloads/version-selection.
     -->
     <Message Text="Downloading latest Google Chrome driver version from '$(_ChromeDriverLatestVersionUri)'..." Importance="normal" />
-    <DownloadFile SourceUrl="$(_ChromeDriverLatestVersionUri)"
-                  DestinationFolder="$(BaseIntermediateOutputPath)"
-                  Retries="1">
+    <DownloadFile SourceUrl="$(_ChromeDriverLatestVersionUri)" DestinationFolder="$(BaseIntermediateOutputPath)" Retries="1">
       <Output TaskParameter="DownloadedFile" PropertyName="_ChromeDriverLatestVersionFile" />
     </DownloadFile>
     <ItemGroup>
@@ -74,8 +62,8 @@
     <!--
       Read the latest driver version out of the file.
     -->
-    <ReadLinesFromFile File="$(_ChromeDriverLatestVersionFile)" >
-      <Output TaskParameter="Lines" PropertyName="_ChromeDriverLatestVersion"/>
+    <ReadLinesFromFile File="$(_ChromeDriverLatestVersionFile)">
+      <Output TaskParameter="Lines" PropertyName="_ChromeDriverLatestVersion" />
     </ReadLinesFromFile>
     <Message Text="The latest version of the Google Chrome driver is $(_ChromeDriverLatestVersion)." Importance="normal" />
     <PropertyGroup>
@@ -92,27 +80,21 @@
   <!--
     Automatically downloads the correct web driver for Chromium-based Microsoft Edge.
   -->
-  <Target Name="DownloadWebDriverForChromiumEdge"
-          BeforeTargets="CollectPackageReferences"
-          Condition="@(PackageReference->AnyHaveMetadataValue(`Identity`, `Microsoft.Edge.SeleniumTools`)) and ($([MSBuild]::IsOsPlatform(`Windows`)) or $([MSBuild]::IsOsPlatform(`OSX`)))">
+  <Target Name="DownloadWebDriverForChromiumEdge" BeforeTargets="CollectPackageReferences" Condition="@(PackageReference-&gt;AnyHaveMetadataValue(`Identity`, `Microsoft.Edge.SeleniumTools`)) and ($([MSBuild]::IsOsPlatform(`Windows`)) or $([MSBuild]::IsOsPlatform(`OSX`)))">
     <Message Text="Downloading driver for Chromium-based Microsoft Edge..." Importance="normal" />
     <!--
       Search for Microsoft Edge in the well-known installation locations.
     -->
     <Message Text="Searching for an installation of Microsoft Edge..." Importance="normal" />
     <ItemGroup Condition="$([MSBuild]::IsOsPlatform(`Windows`))">
-      <_EdgeVersions Include="$(ProgramFiles)\Microsoft\Edge\Application\**\*.manifest"/>
-      <_EdgeVersions Include="$(MSBuildProgramFiles32)\Microsoft\Edge\Application\**\*.manifest"/>
+      <_EdgeVersions Include="$(ProgramFiles)\Microsoft\Edge\Application\**\*.manifest" />
+      <_EdgeVersions Include="$(MSBuildProgramFiles32)\Microsoft\Edge\Application\**\*.manifest" />
     </ItemGroup>
-    <PropertyGroup Condition="@(_EdgeVersions->Count()) > 0">
+    <PropertyGroup Condition="@(_EdgeVersions-&gt;Count()) &gt; 0">
       <_EdgeVersion Condition=" $([System.Char]::IsDigit(`%(_EdgeVersions.Filename)`, 0)) ">%(_EdgeVersions.Filename)</_EdgeVersion>
     </PropertyGroup>
     <!-- On macOS query the well-known binary for the version -->
-    <Exec Condition="$([MSBuild]::IsOsPlatform(`OSX`))"
-          ConsoleToMSBuild="true"
-          Command="'/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge' --version"
-          IgnoreExitCode="true"
-          StandardOutputImportance="low">
+    <Exec Condition="$([MSBuild]::IsOsPlatform(`OSX`))" ConsoleToMSBuild="true" Command="'/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge' --version" IgnoreExitCode="true" StandardOutputImportance="low">
       <Output TaskParameter="ConsoleOutput" PropertyName="_EdgeVersion" />
     </Exec>
     <!--
@@ -132,10 +114,7 @@
       See https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/.
     -->
     <Message Condition=" '$(_EdgeDriverLatestVersionUri)' != '' " Text="Downloading latest Microsoft Edge driver version from '$(_EdgeDriverLatestVersionUri)'..." Importance="normal" />
-    <DownloadFile Condition=" '$(_EdgeDriverLatestVersionUri)' != '' "
-                  SourceUrl="$(_EdgeDriverLatestVersionUri)"
-                  DestinationFolder="$(BaseIntermediateOutputPath)"
-                  Retries="1">
+    <DownloadFile Condition=" '$(_EdgeDriverLatestVersionUri)' != '' " SourceUrl="$(_EdgeDriverLatestVersionUri)" DestinationFolder="$(BaseIntermediateOutputPath)" Retries="1">
       <Output TaskParameter="DownloadedFile" PropertyName="_EdgeDriverLatestVersionZipFile" />
     </DownloadFile>
     <ItemGroup Condition=" '$(_EdgeDriverLatestVersionZipFile)' != '' ">
@@ -144,10 +123,6 @@
     <!--
       Unzip the driver to the output directory.
     -->
-    <Unzip Condition=" '$(_EdgeDriverLatestVersionZipFile)' != '' "
-           SourceFiles="$(_EdgeDriverLatestVersionZipFile)"
-           DestinationFolder="$(OutputPath)"
-           OverwriteReadOnlyFiles="true"
-           SkipUnchangedFiles="true" />
+    <Unzip Condition=" '$(_EdgeDriverLatestVersionZipFile)' != '' " SourceFiles="$(_EdgeDriverLatestVersionZipFile)" DestinationFolder="$(OutputPath)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />
   </Target>
 </Project>
